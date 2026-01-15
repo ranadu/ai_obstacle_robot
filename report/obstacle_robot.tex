@@ -1,0 +1,64 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+
+\title{AI-Based Obstacle Avoidance Robot with Real-Time Digital Twin}
+\author{Robert Anadu}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Overview}
+This project implements a minimal autonomous differential-drive robot that avoids obstacles using a two-state decision controller (finite state machine with hysteresis). A Python-based digital twin visualizes motion in real time and logs telemetry for validation plots.
+
+\section{System Architecture}
+The robot measures obstacle distance (ultrasonic), selects an action (FORWARD or TURN), and outputs velocity commands. Telemetry is streamed (or emulated) and consumed by the digital twin for visualization and logging.
+
+\section{Kinematic Model}
+A unicycle model is used in the digital twin:
+\[
+\dot{x} = v\cos\theta,\quad
+\dot{y} = v\sin\theta,\quad
+\dot{\theta} = \omega
+\]
+
+\section{Decision Logic (AI Layer)}
+The autonomy is implemented as a finite state machine (FSM) with hysteresis:
+\[
+\text{If } d < d_{\text{stop}} \Rightarrow \text{TURN},\quad
+\text{If } d > d_{\text{go}} \Rightarrow \text{FORWARD}
+\]
+Hysteresis prevents oscillation near the switching boundary and produces stable behavior in the presence of sensor noise.
+
+\section{Digital Twin and Telemetry}
+The Python simulator visualizes:
+\begin{itemize}
+\item robot pose and heading
+\item obstacle locations
+\item trajectory trail
+\end{itemize}
+It logs telemetry to CSV and generates validation plots.
+
+\section{Results}
+Figure~\ref{fig:distance} shows minimum obstacle distance over time. Figure~\ref{fig:controls} shows the commanded linear and angular velocities that produce avoidance behavior.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\linewidth]{../out/distance_vs_time.png}
+\caption{Nearest obstacle distance vs time (from logged telemetry).}
+\label{fig:distance}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\linewidth]{../out/controls_vs_time.png}
+\caption{Control commands vs time (linear velocity and turn rate).}
+\label{fig:controls}
+\end{figure}
+
+\section{Limitations and Future Work}
+Current work uses a single distance metric to the nearest obstacle. Future work includes multi-sensor fusion, dynamic obstacles, and real hardware deployment with motor saturation and slip modeling.
+
+\end{document}
